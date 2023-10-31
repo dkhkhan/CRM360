@@ -1,0 +1,106 @@
+@extends('layouts.crm360');
+@section('content')
+    <div class="container">
+        <div class="row">
+            <div class="col-12 col-md-8">
+                @if(session('success'))
+                <div class="alert alert-success" role="alert">
+                    {{ session('success') }}
+                </div>
+                @endif
+                @if(session('failed'))
+                <div class="alert alert-danger" role="alert">
+                    {{ session('failed') }}
+                </div>
+                @endif
+                <div class="row">
+                    <!-- Transactions -->
+                    <div class="col-12 col-md-12 position-relative column-set">
+                        <div class="card border-0 mb-4">
+                            <div class="card-header">
+                                <div class="row">
+                                    <div class="col-auto">
+                                        <i class="bi bi-shop h5 avatar avatar-40 bg-light-theme rounded"></i>
+                                    </div>
+                                    <div class="col-auto align-self-center">
+                                        <h6 class="fw-medium mb-0">User Countries</h6>
+                                        <p class="text-secondary small">All Countries</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-body p-0">
+                                <table class="table table-borderless footable" data-show-toggle="true">
+                                    <thead>
+                                        <tr class="text-muted">
+                                            <th class="w-12">#</th>
+                                            <th style="width:80%;">Country Name</th>
+                                            <th style="width:15%;">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach($countries as $country)
+                                        <tr>
+                                            <td>{{ $loop->iteration }}</td>
+                                            <td>
+                                                <p>{{ $country->country_name }}</p>
+                                            </td>
+                                            <td>
+                                               <a href="{{ route('userCountry.edit',$country->id) }}" class="btn btn-theme"><i class="bi bi-pencil-square"></i></a>
+                                               <a class="btn btn-theme bg-red" href="javascript:void(0);" onclick="if(confirm('Are you sure?')){$(this).parent('td').find('form').submit();}"><i class="bi bi-trash3"></i></a>
+                                               <form action="{{ route('userCountry.destroy',$country->id) }}" method="post">
+                                                    @method('DELETE')
+                                                    @csrf
+                                               </form>
+                                            </td>
+                                        </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                                <div class="row align-items-center mx-0 mb-3">
+                                    <div class="col-6 ">
+                                        <span class="hide-if-no-paging">
+                                            Showing <span id="footablestot"></span> page
+                                        </span>
+                                    </div>
+                                    <div class="col-6" id="footable-pagination"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-md-4">
+                <div class="card border-0 mb-4 px-2">
+                    <div class="card-header mb-4">
+                        <h5 class="title">Update Country</h5>
+                    </div>
+                    <div class="card-body p-0">
+                        <form action="{{route('userCountry.update',$selectedCountry->id)}}" method="POST">
+                            @method('PUT')
+                            @csrf
+                            <div class="row">
+                                <div class="col-12 col-md-12 mb-md-0  was-validated">
+                                    <div class="mb-4">
+                                        <div class="form-group mb-3 position-relative check-valid @if(!$errors->any())is-valid @endif">
+                                            <div class="input-group input-group-lg">
+                                                <span class="input-group-text text-theme border-end-0"><i class="bi bi-person"></i></span>
+                                                <div class="form-floating">
+                                                    <input type="text" placeholder="Enter Country" value="{{ old('country_name',$selectedCountry->country_name) }}" name="country_name" class="form-control border-start-0">
+                                                    <label>Country Name</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        @error('country_name')
+                                            <div class="invalid-feedback mb-3">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                    <button class="btn btn-theme" type="submit">Update Country</button>
+                                </div>
+                            </div>
+                        </form> 
+                    </div>
+                </div>
+            </div>
+        </div>   
+    <div>
+@endsection
