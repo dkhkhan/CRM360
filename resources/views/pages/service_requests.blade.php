@@ -51,7 +51,7 @@
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
-            <div class="row mt-4">
+            <div class="row">
                 <div class="col-12 col-md-12 position-relative column-set">
                     <div class="card border-0 mb-4">
                         <div class="card-body p-0">

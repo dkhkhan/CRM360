@@ -14,7 +14,7 @@ class IncidentController extends Controller
     public function incidents() : View{
         $userCountries = array();
         $logedInUser = Auth::user();
-        if($logedInUser->countries){
+        if($logedInUser && $logedInUser->countries){
             $countries = $logedInUser->countries;
             foreach($countries as $country){
                 $userCountries[] = $country->country->country_name;
@@ -89,8 +89,10 @@ class IncidentController extends Controller
        $request_type    = isset($_GET['request_type']) ? $_GET['request_type'] : '';
        $date_range      = isset($_GET['date_range']) ? $_GET['date_range'] : '';
        $prob_category   = isset($_GET['prob_category']) ? $_GET['prob_category'] : '';
-       $start = isset($_GET['start']) ? $_GET['start'] : '';
-       $length = isset($_GET['length']) ? $_GET['length'] : '';
+       $start = isset($_GET['start']) ? $_GET['start'] : 0;
+       $length = isset($_GET['length']) ? $_GET['length'] : 10;
+       $sortColumn = isset($_GET['order']) ? $_GET['order'][0]['column'] : 0;
+       $sortDirection = isset($_GET['order']) ? $_GET['order'][0]['dir'] : 'ASC';
        $date_from = Carbon::now()->subDays(6)->toDateString();
        $date_to = Carbon::now()->toDateString();
        $render = array();
@@ -111,7 +113,13 @@ class IncidentController extends Controller
                     $date_to = $to_year.'-'.$to_month.'-'.$to_day;
                 }
             }
-        $all_cases = Incident::getAllCasetypeByCountry($case_country,$date_from,$date_to,$start,$length);
+        // echo '<pre />';
+        // print_r($_REQUEST);
+        // echo $_REQUEST['order'][0]['column'];
+        // echo '<br />';
+        // echo $_REQUEST['order'][0]['dir'];
+        // die();
+        $all_cases = Incident::getAllCasetypeByCountry($case_country,$date_from,$date_to,$start,$length,$sortColumn,$sortDirection);
         $data = array();
         if(array_key_exists('data',$all_cases)){
             $count = $start;
@@ -179,7 +187,7 @@ class IncidentController extends Controller
                     $date_to = $to_year.'-'.$to_month.'-'.$to_day;
                 }
             }
-            $all_cases = Incident::getCasesByCondition($case_type,$case_country,$date_from,$date_to,$start,$length);
+            $all_cases = Incident::getCasesByCondition($case_type,$case_country,$date_from,$date_to,$start,$length,$sortColumn,$sortDirection);
             $count = $start;
             $data = array();
             if(array_key_exists('data',$all_cases)){
@@ -295,7 +303,7 @@ class IncidentController extends Controller
                     $date_to = $to_year.'-'.$to_month.'-'.$to_day;
                 }
             }
-            $all_cases = Incident::getGmCasesList($case_type,$prob_category,$case_country,$date_from,$date_to,$case_type,$start,$length);
+            $all_cases = Incident::getGmCasesList($case_type,$prob_category,$case_country,$date_from,$date_to,$start,$length,$sortColumn,$sortDirection);
             $count = $start;
             $data = array();
             if(array_key_exists('data',$all_cases)){
@@ -367,7 +375,7 @@ class IncidentController extends Controller
                 }
             }
             
-            $all_cases = Incident::getCasesByCondition($case_type,$case_country,$date_from,$date_to,$start,$length);
+            $all_cases = Incident::getCasesByCondition($case_type,$case_country,$date_from,$date_to,$start,$length,$sortColumn,$sortDirection);
             $count = $start;
             $data = array();
             if(array_key_exists('data',$all_cases)){

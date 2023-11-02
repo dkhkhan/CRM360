@@ -63,7 +63,7 @@
                             <table id="gm_service_request" class="display" style="width:100%">
                                 <thead>
                                     <tr>
-                                        <th>No</th>
+                                        <th class="sorting_disabled">No</th>
                                         <th>Project</th>
                                         <th>Property Details</th>
                                         <th>Department</th>
@@ -250,7 +250,11 @@
                 serverSide: true,
                 searching : false,
                 lengthChange : false,
-                bDestroy: true
+                bDestroy: true,
+                columnDefs: [
+                    { orderable: false, targets: [0] },
+                    { orderable: false, targets: [1] }
+                ]
             });
         }
 

@@ -82,6 +82,10 @@ $(window).on("load", function () {
                 searching: false,
                 lengthChange: false,
                 bDestroy: true,
+                columnDefs: [
+                    { orderable: false, targets: [0] },
+                    { orderable: false, targets: [1] },
+                ],
             });
             /*$.ajax({
                 url: url,
@@ -148,6 +152,10 @@ $(window).on("load", function () {
             searching: false,
             lengthChange: false,
             bDestroy: true,
+            columnDefs: [
+                { orderable: false, targets: [0] },
+                { orderable: false, targets: [1] },
+            ],
         });
     });
 
@@ -195,6 +203,10 @@ $(window).on("load", function () {
                 searching: false,
                 lengthChange: false,
                 bDestroy: true,
+                columnDefs: [
+                    { orderable: false, targets: [0] },
+                    { orderable: false, targets: [1] },
+                ],
             });
         }
     );

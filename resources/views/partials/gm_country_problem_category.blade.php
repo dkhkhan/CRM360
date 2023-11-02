@@ -2,7 +2,7 @@
     @php
         $country_logo = $key == 'United Arab Emirates' ? 'uae.png' :strtolower($key).'.png';
     @endphp
-<div class="col-12 col-md-6 col-lg-6 col-xxl-2 mb-3">
+<div class="col-12 col-md-6 col-lg-3 col-xxl-2 mb-3">
     <div class="card border-0 bg-gradient-theme-light theme-blue h-100">
         <div class="card-header">
             <div class="row align-items-center">
@@ -105,7 +105,7 @@
 </div>
 @endforeach
 <!-- Top Complaint --> 
-<div class="col-12 col-md-6 col-lg-6 col-xxl-2">
+<div class="col-12 col-md-6 col-lg-3 col-xxl-2">
     <div class="card border-0">
         <div class="card-header">
             <div class="row align-items-center">
@@ -164,7 +164,7 @@
 <!-- END: Top Complaint --> 
 
 <!-- Maintenance Request --> 
-<div class="col-12 col-md-6 col-lg-6 col-xxl-2">
+<div class="col-12 col-md-6 col-lg-3 col-xxl-2">
     <div class="card border-0">
         <div class="card-header">
             <div class="row align-items-center">
@@ -223,7 +223,7 @@
 <!-- END Maintenance Request --> 
 
 <!-- Enquiry --> 
-<div class="col-12 col-md-6 col-lg-6 col-xxl-2">
+<div class="col-12 col-md-6 col-lg-3 col-xxl-2">
     <div class="card border-0">
         <div class="card-header">
             <div class="row align-items-center">
@@ -282,7 +282,7 @@
 <!-- END Enquiry --> 
 
 <!-- Suggestions --> 
-<div class="col-12 col-md-6 col-lg-6 col-xxl-2">
+<div class="col-12 col-md-6 col-lg-3 col-xxl-2">
 <div class="card border-0">
     <div class="card-header">
         <div class="row align-items-center">

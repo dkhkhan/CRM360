@@ -110,10 +110,10 @@ div#gm_service_request_paginate{
     padding-top: 25px;
     padding-bottom: 25px;
 }
-table#gm_service_request td{
+/* table#gm_service_request td{
     padding-top: 15px;
     padding-bottom: 15px;
-}
+} */
 .dataTables_wrapper .dataTables_paginate .paginate_button.current, .dataTables_wrapper .dataTables_paginate .paginate_button.current:hover{
     background: linear-gradient(to bottom, #585858 0%, #111 100%) !important;
 }

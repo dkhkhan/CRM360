@@ -179,7 +179,7 @@ class Incident extends Model
         return $kpi_in_progress;
     }
 
-    public static function getCasesByCondition($case_type = '',$country = '',$from_date = '',$to_date = '',$start='',$length=''){
+    public static function getCasesByCondition($case_type = '',$country = '',$from_date = '',$to_date = '',$start='',$length='',$sortColumn = 0,$sortDirection = 'asc'){
         $query = Incident::where('Case Type','!=', 'Test');
         $query->whereNotIn('Case Category',array('Mall Related', 'Loyalty Members Services'));
         $query->where('KPI SLA','!=','incident_eh_casecontacted_createdon');
@@ -217,6 +217,31 @@ class Incident extends Model
         }
         if($length){
             $query->take($length);
+        }
+        if($sortDirection === 'desc'){
+            switch($sortColumn){
+                case 2:
+                    $query->orderByDesc('Property');
+                break;
+                case 3:
+                    $query->orderByDesc('Dispatch Group');
+                break;
+                case 4:
+                    $query->orderByDesc('Case Source');
+                break;
+                case 5:
+                    $query->orderByDesc('Case Type');
+                break;
+                case 6:
+                    $query->orderByDesc(DB::raw("CAST([Created On] as DATE)"));
+                break;
+                case 7:
+                    $query->orderByDesc(DB::raw("CAST([Failure Time] as DATE)"));
+                break;
+                case 8:
+                    $query->orderByDesc('KPI Status');
+                break;
+            }
         }
         $data = $query->get()->toArray();
         $result = array();
@@ -301,7 +326,7 @@ class Incident extends Model
         $life_time_total = $query->distinct('incidentid')->count();
         return $life_time_total;
     }
-    public static function getAllCasetypeByCountry($country = '',$from_date = '',$to_date='',$start='',$length=''){
+    public static function getAllCasetypeByCountry($country = '',$from_date = '',$to_date='',$start='',$length='',$sortColumn = 0,$sortDirection = 'asc'){
         $query = Incident::whereNotNull('Country');
         $query->where('Case Type','!=','Test');
         $query->whereIn('Case Nature',array('Refund Request', 'Support Case'));
@@ -319,6 +344,31 @@ class Incident extends Model
         if($length){
             $query->take($length);
         }
+        if($sortDirection === 'desc'){
+            switch($sortColumn){
+                case 2:
+                    $query->orderByDesc('Property');
+                break;
+                case 3:
+                    $query->orderByDesc('Dispatch Group');
+                break;
+                case 4:
+                    $query->orderByDesc('Case Source');
+                break;
+                case 5:
+                    $query->orderByDesc('Case Type');
+                break;
+                case 6:
+                    $query->orderByDesc(DB::raw("CAST([Created On] as DATE)"));
+                break;
+                case 7:
+                    $query->orderByDesc(DB::raw("CAST([Failure Time] as DATE)"));
+                break;
+                case 8:
+                    $query->orderByDesc('KPI Status');
+                break;
+            }
+        }
         $cases = $query->get()->toArray();
         $result = array();
         $result['total_records'] = $count;
@@ -335,7 +385,7 @@ class Incident extends Model
         return $result;
     }
 
-    public static function getGmCasesList($case_type = '',$category='',$country='',$from_date='',$to_date='',$start='',$length = ''){
+    public static function getGmCasesList($case_type = '',$category='',$country='',$from_date='',$to_date='',$start='',$length = '',$sortColumn = 0,$sortDirection = 'asc'){
 
         $query = Incident::where('Case Type',$case_type);
         $query->whereIn('Case Nature',array('Refund Request', 'Support Case'));
@@ -352,6 +402,31 @@ class Incident extends Model
         }
         if($length){
             $query->take($length);
+        }
+        if($sortDirection === 'desc'){
+            switch($sortColumn){
+                case 2:
+                    $query->orderByDesc('Property');
+                break;
+                case 3:
+                    $query->orderByDesc('Dispatch Group');
+                break;
+                case 4:
+                    $query->orderByDesc('Case Source');
+                break;
+                case 5:
+                    $query->orderByDesc('Case Type');
+                break;
+                case 6:
+                    $query->orderByDesc(DB::raw("CAST([Created On] as DATE)"));
+                break;
+                case 7:
+                    $query->orderByDesc(DB::raw("CAST([Failure Time] as DATE)"));
+                break;
+                case 8:
+                    $query->orderByDesc('KPI Status');
+                break;
+            }
         }
         $cases = $query->get()->toArray();
         $result = array();
