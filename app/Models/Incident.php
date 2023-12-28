@@ -72,7 +72,7 @@ class Incident extends Model
         return $result;
     }
     // get all countries kpi by Failure Time
-    public static function allCountriesTotalCases($from,$to,$country=''){
+    public static function allCountriesTotalCases($from,$to,$country='',$view_type = ''){
         $query = Incident::select('Country as country','KPI Status as kpi_status',DB::raw('COUNT(*) as total_count'));
         $query->whereNotNull('Case Nature ');
         $query->where('Case Type','!=', 'Test');
@@ -82,7 +82,7 @@ class Incident extends Model
         $query->whereNotIn('country',array('Eagle Hills Co.', 'Nigeria', 'Egypt', 'Ramhan Island'));
         $query->whereIn('Case Nature ',array('Refund Request', 'Support Case'));
         $query->whereIn('KPI Status',array('Failed', 'In-Progress', 'Nearing SLA Breach', 'Succeeded'));
-        $query->whereBetween(DB::raw("CAST([Failure Time] AS DATE)"), array($from, $to));
+        $query->whereBetween(DB::raw("CAST([Created On] AS DATE)"), array($from, $to));
         if($country){
             $query->where('country',$country);
         }else if($country == '' && session()->has('user_countires')){
@@ -93,9 +93,76 @@ class Incident extends Model
         $query->groupBy('Case Nature ');
         $incidents = $query->get();
         $data = array();
-        foreach($incidents as $incident){
-            $data[$incident->country][$incident->kpi_status] = $incident->total_count;
+        $userCountries = session()->has('user_countires') ? session()->get('user_countires') : array();
+        if(count($incidents) > 0){
+            foreach($incidents as $incident){
+                // if($incident->kpi_status == 'Failed'){
+                //     $data[$incident->country][$incident->kpi_status] = self::breachedSLA($from,$to,$incident->country);    
+                // }else if($incident->kpi_status == 'Nearing SLA Breach'){
+                //     $data[$incident->country][$incident->kpi_status] = self::nearingBreachSLA($from,$to,$incident->country);    
+                // }else if(in_array($incident->kpi_status,array('In-Progress','Succeeded'))){
+                //     $data[$incident->country][$incident->kpi_status] = $incident->total_count;
+                // }else{
+                //     $data[$incident->country][$incident->kpi_status] = 0;
+                // }
+
+                $data[$incident->country][$incident->kpi_status] = $incident->total_count;
+                if(array_key_exists('total_cases',$data[$incident->country])){
+                    $data[$incident->country]['total_cases'] += $incident->total_count;
+                }else{
+                    $data[$incident->country]['total_cases']  = $incident->total_count;
+                }
+            }
+        }else{
+            $data[$country]['In-Progress'] = 0;
+            $data[$country]['Succeeded'] = 0;
+            $data[$country]['Failed'] = 0;
+            $data[$country]['Nearing SLA Breach'] = 0;
+            $data[$country]['total_cases'] = 0;
         }
+
+        if($userCountries && $view_type != 'gm_view'){
+            foreach($userCountries as $uCountry){
+                if(!array_key_exists($uCountry,$data)){
+                    $data[$uCountry]['In-Progress'] = 0;
+                    $data[$uCountry]['Succeeded'] = 0;
+                    $data[$uCountry]['Failed'] = 0;
+                    $data[$uCountry]['Nearing SLA Breach'] = 0;
+                    $data[$uCountry]['total_cases'] = 0;
+                }else{
+                    if(!array_key_exists('Failed',$data[$uCountry])){
+                        $data[$uCountry]['Failed'] = 0;
+                    }
+                    if(!array_key_exists('Succeeded',$data[$uCountry])){
+                        $data[$uCountry]['Succeeded'] = 0;
+                    }
+                    if(!array_key_exists('Nearing SLA Breach',$data[$uCountry])){
+                        $data[$uCountry]['Nearing SLA Breach'] = 0;
+                    }
+                    if(!array_key_exists('In-Progress',$data[$uCountry])){
+                        $data[$uCountry]['In-Progress'] = 0;
+                    }
+                }
+            }
+        }
+
+        if($view_type == 'gm_view' && $country){
+            if(!array_key_exists('Failed',$data[$country])){
+                $data[$country]['Failed'] = 0;
+            }
+            if(!array_key_exists('Succeeded',$data[$country])){
+                $data[$country]['Succeeded'] = 0;
+            }
+            if(!array_key_exists('Nearing SLA Breach',$data[$country])){
+                $data[$country]['Nearing SLA Breach'] = 0;
+            }
+            if(!array_key_exists('In-Progress',$data[$country])){
+                $data[$country]['In-Progress'] = 0;
+            }
+        }
+        // echo '<pre />';
+        // print_r($data);
+        // die();
         return $data;
     }
     public static function totalKpi($condition = 'default'){
@@ -146,6 +213,38 @@ class Incident extends Model
         $kpi_failed = $query->count();
         return $kpi_failed;
     }
+    public static function breachedSLA($from_date,$to_date,$country = ''){
+        $query = Incident::where('KPI Status','Failed');
+        $query->whereNotNull('country');
+        $query->where('Case Type','!=', 'Test');
+        $query->whereNotIn('Case Category',array('Mall Related', 'Loyalty Members Services'));
+        $query->where('KPI SLA','!=','incident_eh_casecontacted_createdon');
+        $query->whereNotIn('WRAP UP CODE',array('Test Care','Test Lead'));
+        $query->whereNotIn('country',array('Eagle Hills Co.', 'Nigeria', 'Egypt', 'Ramhan Island'));
+        $query->whereIn('Case Nature',array('Refund Request', 'Support Case'));
+        $query->whereBetween(DB::raw("CAST([Failure Time] as DATE)"), array($from_date, $to_date));
+        if($country){
+            $query->where('country',$country);
+        }
+        $kpi_failed = $query->count();
+        return $kpi_failed;
+    }
+    public static function nearingBreachSLA($from_date,$to_date,$country = ''){
+        $query = Incident::where('KPI Status','Nearing SLA Breach');
+        $query->whereNotNull('country');
+        $query->where('Case Type','!=', 'Test');
+        $query->whereNotIn('Case Category',array('Mall Related', 'Loyalty Members Services'));
+        $query->where('KPI SLA','!=','incident_eh_casecontacted_createdon');
+        $query->whereNotIn('WRAP UP CODE',array('Test Care','Test Lead'));
+        $query->whereNotIn('country',array('Eagle Hills Co.', 'Nigeria', 'Egypt', 'Ramhan Island'));
+        $query->whereIn('Case Nature',array('Refund Request', 'Support Case'));
+        $query->whereBetween(DB::raw("CAST([Failure Time] as DATE)"), array($from_date, $to_date));
+        if($country){
+            $query->where('country',$country);
+        }
+        $kpi_failed = $query->count();
+        return $kpi_failed;
+    }
     public static function successedKpi($from_date,$to_date){
         $query = Incident::where('KPI Status','Succeeded');
         $query->whereNotNull('country');
@@ -189,28 +288,52 @@ class Incident extends Model
         $query->whereIn('Case Nature',array('Refund Request', 'Support Case'));
         if($country){
             $query->where('country',$country);
+        }else if($country == '' && session()->has('user_countires')){
+            $query->whereIn('country',session()->get('user_countires'));
         }
         switch($case_type){
             case "totalCases":
                 $query->whereIn('KPI Status',array('Failed', 'In-Progress', 'Nearing SLA Breach', 'Succeeded'));
+                $query->whereBetween(DB::raw("CAST([Created On] as DATE)"), array($from_date,$to_date));
+                break;
+            case  "supportTotalCases":
+                $query->whereIn('KPI Status',array('Failed', 'In-Progress', 'Nearing SLA Breach', 'Succeeded'));
+                $query->whereBetween(DB::raw("CAST([Created On] as DATE)"), array($from_date,$to_date));
                 break;
             case "resolvedCases":
                 $query->where('KPI Status','Succeeded');
+                $query->whereBetween(DB::raw("CAST([Created On] as DATE)"), array($from_date,$to_date));
+                break;
+            case "supportResolvedCases":
+                $query->where('KPI Status','Succeeded');
+                $query->whereBetween(DB::raw("CAST([Created On] as DATE)"), array($from_date,$to_date));
                 break;
             case "inProgressCases":
                 $query->where('KPI Status','In-Progress');
+                $query->whereBetween(DB::raw("CAST([Created On] as DATE)"), array($from_date,$to_date));
+                break;
+            case "supportInProgressCases":
+                $query->where('KPI Status','In-Progress');
+                $query->whereBetween(DB::raw("CAST([Created On] as DATE)"), array($from_date,$to_date));
                 break;
             case "failedCases":
                 $query->where('KPI Status','Failed');
+                $query->whereBetween(DB::raw("CAST([Failure Time] as DATE)"), array($from_date,$to_date));
+                break;
+            case "supportFailedCases":
+                $query->where('KPI Status','Failed');
+                $query->whereBetween(DB::raw("CAST([Created On] as DATE)"), array($from_date,$to_date));
                 break;
             case "nearingSlaBreach":
                 $query->where('KPI Status','Nearing SLA Breach');
+                $query->whereBetween(DB::raw("CAST([Failure Time] as DATE)"), array($from_date,$to_date));
                 break;
-            default:
-                $query->whereIn('KPI Status',array('Failed', 'In-Progress', 'Nearing SLA Breach', 'Succeeded'));
+            case "supportNearing":
+                $query->where('KPI Status','Nearing SLA Breach');
+                $query->whereBetween(DB::raw("CAST([Created On] as DATE)"), array($from_date,$to_date));
                 break;
         }
-        $query->whereBetween(DB::raw("CAST([Failure Time] as DATE)"), array($from_date,$to_date));
+        
         $count = $query->count();
         if($start){
             $query->offset($start);

@@ -117,6 +117,23 @@ div#gm_service_request_paginate{
 .dataTables_wrapper .dataTables_paginate .paginate_button.current, .dataTables_wrapper .dataTables_paginate .paginate_button.current:hover{
     background: linear-gradient(to bottom, #585858 0%, #111 100%) !important;
 }
+td.details-control { 
+    /* Image in the first column to 
+        indicate expand*/ 
+    background: url('images/more.png') 
+        no-repeat center; 
+          
+    cursor: pointer; 
+} 
+
+tr.shown td.details-control { 
+    background: url('images/shrinkdata.PNG')  
+        no-repeat center; 
+} 
+
+table.dataTable td.dt-control:before{
+    color: #fff !important;
+}
 @keyframes crmlogoiconsanimate {
     0%{
         transform: scale(1);

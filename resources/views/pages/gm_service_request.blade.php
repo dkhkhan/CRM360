@@ -36,9 +36,7 @@
         </div>
     </div>
     <div class="row ajax_service_requests">
-            {{-- @if($country_kpi) --}}
-                @include('partials.gm_country_problem_category',['all_countries' => $country_kpi,$case_types])
-            {{-- @endif --}}
+        @include('partials.gm_country_problem_category',['all_countries' => $country_kpi,$case_types])
     </div>
     <div class="row">
         <div class="col-12 col-md-6 col-lg-6 col-xxl-2">&nbsp;</div>
@@ -63,7 +61,8 @@
                             <table id="gm_service_request" class="display" style="width:100%">
                                 <thead>
                                     <tr>
-                                        <th class="sorting_disabled">No</th>
+                                        <th></th>
+                                        <th>No</th>
                                         <th>Project</th>
                                         <th>Property Details</th>
                                         <th>Department</th>
@@ -86,7 +85,51 @@
 @section('scripts')
     <script type="text/javascript">
     $(window).on('load',function(){
+        let table;
         loadDataTable();
+        function loadDataTable(){
+            var $calenderLabel = $("input#calendarLabel").val();
+            var $date_range =
+                $("input#titlecalendar")
+                    .val()
+                    .replace(" - ", "_to_")
+                    .replaceAll("/", "-") +
+                "_label_" +
+                $calenderLabel;
+            table = new DataTable('#gm_service_request',{
+                ajax: {
+                    url: $("input#titlecalendar").data("action"),
+                    data: function (d) {
+                        d.request_type = 'gm_all_cases';
+                        d.date_range = $date_range;
+                        d.case_country = $('#country_name').val();
+                    }
+                },
+                processing: true,
+                serverSide: true,
+                searching : false,
+                lengthChange : false,
+                bDestroy: true,
+                columnDefs: [
+                    { orderable: false, targets: [0] },
+                    { orderable: false, targets: [1] },
+                    { orderable: false, targets: [2] },
+                ],
+                columns : [
+                { data : null,className : 'dt-control',defaultContent : '', orderable : false },
+                { data : 'count_row' },
+                { data : 'logo_row' },
+                { data : 'project_details_row' },
+                { data : 'department_row' },
+                { data : 'source_row' },
+                { data : 'casetype_row' },
+                { data : 'createdon_row' },
+                { data : 'failertime_row' },
+                { data : 'status_row' },
+            ],
+            });
+        }
+
         var from_date = '{{ $from_date }}';
         var to_date = '{{ $to_date }}';
         $("#titlecalendar").daterangepicker(
@@ -144,17 +187,6 @@
                                 $response.gm_view_html_country
                             );
                             loadDataTable();
-                            // $(".gm_cases_list").html(
-                            //     $response.gm_view_html_cases_list
-                            // );
-                            // //.trigger("footable_redraw");
-                            // $($response.calender_label)
-                            //     ? $("span.gm_case_list_view_label").html(
-                            //         $response.calender_label
-                            //     )
-                            //     : "Last 7 Days";
-
-                            // $('body').find("table.table").footable();
                         }
                         var $failed_kpi_percentage = 0;
                         var $near_sla_breach_percentage = 0;
@@ -227,8 +259,19 @@
                 });
             }
         );
-
-        function loadDataTable(){
+        
+    $("body").on(
+        "click",
+        "a.gm_total_cases,a.gm_resolved_cases,a.gm_in_progress_cases,a.gm_failed_cases,a.gm_nearing_sla_breach,a.gm_total_cases",
+        function (e) {
+            e.preventDefault();
+            $(".loader-wrap").css("display", "block");
+            $(document).on("ajaxComplete", function () {
+                $(".loader-wrap").css("display", "none");
+            });
+            var $_this = $(this).parents(".card-body");
+            var $case_country = $_this.find(".case_country").val();
+            var $request_type = $_this.find(".request_type").val();
             var $calenderLabel = $("input#calendarLabel").val();
             var $date_range =
                 $("input#titlecalendar")
@@ -237,26 +280,228 @@
                     .replaceAll("/", "-") +
                 "_label_" +
                 $calenderLabel;
-            $('#gm_service_request').DataTable({
+            var $case_type = "";
+            if ($(this).hasClass("gm_total_cases")) {
+                $case_type = "totalCases";
+            } else if ($(this).hasClass("gm_resolved_cases")) {
+                $case_type = "resolvedCases";
+            } else if ($(this).hasClass("gm_in_progress_cases")) {
+                $case_type = "inProgressCases";
+            } else if ($(this).hasClass("gm_failed_cases")) {
+                $case_type = "failedCases";
+            } else if ($(this).hasClass("gm_nearing_sla_breach")) {
+                $case_type = "nearingSlaBreach";
+            }
+            const url = $_this.find(".case_country").data("action");
+            table = new DataTable("#gm_service_request",{
                 ajax: {
-                    url: $("input#titlecalendar").data("action"),
+                    url: url,
                     data: function (d) {
-                        d.request_type = 'gm_all_cases';
+                        d.case_type = $case_type;
+                        d.request_type = $request_type;
                         d.date_range = $date_range;
-                        d.case_country = $('#country_name').val();
-                    }
+                        d.case_country = $case_country;
+                    },
                 },
                 processing: true,
                 serverSide: true,
-                searching : false,
-                lengthChange : false,
+                searching: false,
+                lengthChange: false,
                 bDestroy: true,
                 columnDefs: [
                     { orderable: false, targets: [0] },
-                    { orderable: false, targets: [1] }
-                ]
+                    { orderable: false, targets: [1] },
+                    { orderable: false, targets: [2] },
+                ],
+                columns: [
+                    {
+                        data: null,
+                        className: "dt-control",
+                        defaultContent: "",
+                        orderable: false,
+                    },
+                    { data: "count_row" },
+                    { data: "logo_row" },
+                    { data: "project_details_row" },
+                    { data: "department_row" },
+                    { data: "source_row" },
+                    { data: "casetype_row" },
+                    { data: "createdon_row" },
+                    { data: "failertime_row" },
+                    { data: "status_row" },
+                ],
             });
         }
+    );
+    
+        
+    $("body").on("click", ".mg_cat_total", function (e) {
+        $(".loader-wrap").css("display", "block");
+        $(document).on("ajaxComplete", function () {
+            $(".loader-wrap").css("display", "none");
+        });
+        const url = $("input#titlecalendar").data("action");
+        var $country = $(".case_country").val();
+        var $calenderLabel = $("input#calendarLabel").val();
+        var $date_range =
+            $("input#titlecalendar")
+                .val()
+                .replace(" - ", "_to_")
+                .replaceAll("/", "-") +
+            "_label_" +
+            $calenderLabel;
+        var $prob_category = $(this).data("category");
+        var $case_type = $(this)
+            .parents(".card-body")
+            .find("input.gm_castype")
+            .val();
+        table = new DataTable("#gm_service_request",{
+            ajax: {
+                url: url,
+                data: function (d) {
+                    d.case_type = $case_type;
+                    d.case_country = $country;
+                    d.calender_label = $calenderLabel;
+                    d.request_type = "gm_problem_category";
+                    d.date_range = $date_range;
+                    d.prob_category = $prob_category;
+                },
+            },
+            processing: true,
+            serverSide: true,
+            searching: false,
+            lengthChange: false,
+            bDestroy: true,
+            columnDefs: [
+                    { orderable: false, targets: [0] },
+                    { orderable: false, targets: [1] },
+                    { orderable: false, targets: [2] },
+                ],
+                columns: [
+                    {
+                        data: null,
+                        className: "dt-control",
+                        defaultContent: "",
+                        orderable: false,
+                    },
+                    { data: "count_row" },
+                    { data: "logo_row" },
+                    { data: "project_details_row" },
+                    { data: "department_row" },
+                    { data: "source_row" },
+                    { data: "casetype_row" },
+                    { data: "createdon_row" },
+                    { data: "failertime_row" },
+                    { data: "status_row" },
+                ],
+        });
+    });
+    $("body").on(
+        "click",
+        "span.service_total_cases,span.service_successed_kpi,span.service_in_progress_kpi,span.service_failed_kpi,span.service_nearing_breach_kpi",
+        function () {
+            $(".loader-wrap").css("display", "block");
+            $(document).on("ajaxComplete", function () {
+                $(".loader-wrap").css("display", "none");
+            });
+            $("#CountryCasesModal").modal("show");
+            var $case_country = $(".suport_case_country").val();
+            var $calenderLabel = $("input#calendarLabel").val();
+            var $date_range =
+                $("input#titlecalendar")
+                    .val()
+                    .replace(" - ", "_to_")
+                    .replaceAll("/", "-") +
+                "_label_" +
+                $calenderLabel;
+            var $case_type = "";
+            if ($(this).hasClass("service_total_cases")) {
+                $case_type = "supportTotalCases";
+            } else if ($(this).hasClass("service_successed_kpi")) {
+                $case_type = "supportResolvedCases";
+            } else if ($(this).hasClass("service_in_progress_kpi")) {
+                $case_type = "supportInProgressCases";
+            } else if ($(this).hasClass("service_failed_kpi")) {
+                $case_type = "supportFailedCases";
+            } else if ($(this).hasClass("service_nearing_breach_kpi")) {
+                $case_type = "supportNearing";
+            }
+            const url = $(".suport_case_country").data("action");
+            $("body").find(".modal-country").html("SUPPORT CASES");
+            $("body").find(".modal-date-label").html($calenderLabel);
+            table = new DataTable("#gm_service_request",{
+                ajax: {
+                    url: url,
+                    data: function (d) {
+                        d.case_type = $case_type;
+                        d.caldender_label = $calenderLabel;
+                        d.request_type = "support_total_cases";
+                        d.case_country = $case_country;
+                        d.date_range = $date_range;
+                    },
+                },
+                processing: true,
+                serverSide: true,
+                searching: false,
+                lengthChange: false,
+                bDestroy: true,
+                columnDefs: [
+                    { orderable: false, targets: [0] },
+                    { orderable: false, targets: [1] },
+                    { orderable: false, targets: [2] },
+                ],
+                columns: [
+                    {
+                        data: null,
+                        className: "dt-control",
+                        defaultContent: "",
+                        orderable: false,
+                    },
+                    { data: "count_row" },
+                    { data: "logo_row" },
+                    { data: "project_details_row" },
+                    { data: "department_row" },
+                    { data: "source_row" },
+                    { data: "casetype_row" },
+                    { data: "createdon_row" },
+                    { data: "failertime_row" },
+                    { data: "status_row" },
+                ],
+            });
+        }
+    );
+        function format(d) {
+            return '<table cellpadding="5" cellspacing="0"' 
+                + ' style="padding-left:50px;">' + 
+                '<tr>' + 
+                '<td>Case ID:</td>' + 
+                '<td>' + d.case_id + '</td>' + 
+                '</tr>' + 
+                '<tr>' + 
+                '<td>Problem Summary:</td>' + 
+                '<td>' + d.problem_summary + '</td>' + 
+                '</tr>' + 
+                '<tr>' + 
+                '<td>Priority:</td>' + 
+                '<td>' + d.priority + '</td>' + 
+                '</tr>' + 
+                '</table>'; 
+        }
+
+        // Add event listener for opening and closing details
+        table.on('click', 'td.dt-control', function (e) {
+            let tr = e.target.closest('tr');
+            let row = table.row(tr);
+        
+            if (row.child.isShown()) {
+                // This row is already open - close it
+                row.child.hide();
+            }
+            else {
+                // Open this row
+                row.child(format(row.data())).show();
+            }
+        });
 
     });
     

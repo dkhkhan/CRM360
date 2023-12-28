@@ -55,9 +55,10 @@
                 <div class="col-12 col-md-12 position-relative column-set">
                     <div class="card border-0 mb-4">
                         <div class="card-body p-0">
-                            <table id="gm_service_request" class="display" style="width:100%">
+                            <table id="service_request" class="display" style="width:100%">
                                 <thead>
                                     <tr>
+                                        <th></th>
                                         <th>No</th>
                                         <th>Project</th>
                                         <th>Property Details</th>
@@ -79,4 +80,124 @@
    </div>
 </div>
 
+@endsection
+
+@section('scripts')
+    <script type="text/javascript">
+    $(window).on('load',function(){
+        let table;
+        $("body").on(
+        "click",
+        "a.total_cases,a.resolved_cases,a.in_progress_cases,a.failed_cases,a.nearing_sla_breach",
+        function (e) {
+            e.preventDefault();
+            $(".loader-wrap").css("display", "block");
+            $(document).on("ajaxComplete", function () {
+                $(".loader-wrap").css("display", "none");
+            });
+            $("#CountryCasesModal").modal("show");
+            var $_this = $(this).parents(".card-body");
+            var $case_country = $_this.find(".case_country").val();
+            var $request_type = $_this.find(".request_type").val();
+            var $calenderLabel = $("input#calendarLabel").val();
+            var $date_range =
+                $("input#titlecalendar")
+                    .val()
+                    .replace(" - ", "_to_")
+                    .replaceAll("/", "-") +
+                "_label_" +
+                $calenderLabel;
+            var $case_type = "";
+            if ($(this).hasClass("total_cases")) {
+                $case_type = "totalCases";
+            } else if ($(this).hasClass("resolved_cases")) {
+                $case_type = "resolvedCases";
+            } else if ($(this).hasClass("in_progress_cases")) {
+                $case_type = "inProgressCases";
+            } else if ($(this).hasClass("failed_cases")) {
+                $case_type = "failedCases";
+            } else if ($(this).hasClass("nearing_sla_breach")) {
+                $case_type = "nearingSlaBreach";
+            }
+            const url = $_this.find(".case_country").data("action");
+            $("body").find(".modal-country").html($case_country);
+            $("body").find(".modal-date-label").html($calenderLabel);
+            table = new DataTable("#service_request", {
+                ajax: {
+                    url: url,
+                    data: function (d) {
+                        d.case_type = $case_type;
+                        d.case_country = $case_country;
+                        d.caldender_label = $calenderLabel;
+                        d.request_type = $request_type;
+                        d.date_range = $date_range;
+                    },
+                },
+                processing: true,
+                serverSide: true,
+                searching: false,
+                lengthChange: false,
+                bDestroy: true,
+                columnDefs: [
+                    { orderable: false, targets: [0] },
+                    { orderable: false, targets: [1] },
+                    { orderable: false, targets: [2] },
+                ],
+                columns: [
+                    {
+                        data: null,
+                        className: "dt-control",
+                        defaultContent: "",
+                        orderable: false,
+                    },
+                    { data: "count_row" },
+                    { data: "logo_row" },
+                    { data: "project_details_row" },
+                    { data: "department_row" },
+                    { data: "source_row" },
+                    { data: "casetype_row" },
+                    { data: "createdon_row" },
+                    { data: "failertime_row" },
+                    { data: "status_row" },
+                ],
+            });
+        }
+    );
+        function format(d) {
+            return '<table cellpadding="5" cellspacing="0"' 
+                + ' style="padding-left:50px;">' + 
+                '<tr>' + 
+                '<td>Case ID:</td>' + 
+                '<td>' + d.case_id + '</td>' + 
+                '</tr>' + 
+                '<tr>' + 
+                '<td>Problem Summary:</td>' + 
+                '<td>' + d.problem_summary + '</td>' + 
+                '</tr>' + 
+                '<tr>' + 
+                '<td>Priority:</td>' + 
+                '<td>' + d.priority + '</td>' + 
+                '</tr>' + 
+                '</table>'; 
+        }
+
+        // Add event listener for opening and closing details
+        $('table#service_request').on('click', 'td.dt-control', function (e) {
+            console.log("Called");
+            let tr = e.target.closest('tr');
+            let row = table.row(tr);
+        
+            if (row.child.isShown()) {
+                // This row is already open - close it
+                row.child.hide();
+            }
+            else {
+                // Open this row
+                row.child(format(row.data())).show();
+            }
+        });
+
+    });
+    
+    </script>
 @endsection

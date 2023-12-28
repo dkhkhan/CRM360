@@ -10,12 +10,13 @@
     $kpi_successed_percentage     = ( $total_kpi > 0 && $kpi_successed > 0 ) ? number_format( $kpi_successed/$total_kpi * 100 ) : 0;
 ?>
 <h6 class="title">SUPPORT CASES <small class="fs-12 fw-light text-secondary"><i>(Cases assigned to departments)</i></small></h4>
-<div class="row">
+<div class="row" id="suport_case_main">
+    <input type="hidden" value="{{ $country }}" class="suport_case_country" data-action="{{route('incident.ajax.request')}}" />
     <div class="col-12 col-md-6 col-lg mb-4 mb-lg-0">
         <div class="row align-items-center">
             <div class="col">
                 <p class="small text-secondary mb-1">Total </p>
-                <h4 class="fw-medium"><span class="service_total_cases">{{ number_format($total_kpi) }}</span> <small class="fs-12 fw-light text-secondary service_total_case_label">Last 7 Days</small></h4>
+                <h4 class="fw-medium"><span class="service_total_cases" style="cursor: pointer;">{{ number_format($total_kpi) }}</span> <small class="fs-12 fw-light text-secondary service_total_case_label">Last 7 Days</small></h4>
             </div>
         </div>
     </div>
@@ -28,7 +29,7 @@
             </div>
             <div class="col">
                 <p class="small text-secondary mb-1">Failed </p>
-                <h4 class="fw-medium"><span class="service_failed_kpi">{{ number_format($kpi_failed) }}</span> <small class="fs-12 fw-light text-secondary service_failed_kpi_percentage">({{ $kpi_failed_percentag.'%' }}) </small></h4>
+                <h4 class="fw-medium"><span class="service_failed_kpi" style="cursor: pointer;">{{ number_format($kpi_failed) }}</span> <small class="fs-12 fw-light text-secondary service_failed_kpi_percentage">({{ $kpi_failed_percentag.'%' }}) </small></h4>
             </div>
         </div>
     </div>
@@ -41,7 +42,7 @@
             </div>
             <div class="col">
                 <p class="small text-secondary mb-1">Near SLA Breach</p>
-                <h4 class="fw-medium"><span class="service_nearing_breach_kpi">{{ number_format($kpi_near_sla_breach) }}</span> <small class="fs-12 fw-light text-secondary service_nearing_breach_percentage">({{ $kpi_near_sla_brach_percentag.'%' }}) </small></h4>
+                <h4 class="fw-medium"><span class="service_nearing_breach_kpi" style="cursor: pointer;">{{ number_format($kpi_near_sla_breach) }}</span> <small class="fs-12 fw-light text-secondary service_nearing_breach_percentage">({{ $kpi_near_sla_brach_percentag.'%' }}) </small></h4>
             </div>
         </div>
     </div>
@@ -54,7 +55,7 @@
             </div>
             <div class="col">
                 <p class="small text-secondary mb-1">In Progress </p>
-                <h4 class="fw-medium"><span class="service_in_progress_kpi">{{ number_format($kpi_in_progress) }}</span> <small class="fs-12 fw-light text-secondary service_in_progress_percentage">({{ $kpi_in_progress_percentag.'%' }}) </small></h4>
+                <h4 class="fw-medium"><span class="service_in_progress_kpi" style="cursor: pointer;">{{ number_format($kpi_in_progress) }}</span> <small class="fs-12 fw-light text-secondary service_in_progress_percentage">({{ $kpi_in_progress_percentag.'%' }}) </small></h4>
             </div>
         </div>
     </div>
@@ -67,7 +68,7 @@
             </div>
             <div class="col">
                 <p class="small text-secondary mb-1">Resolved </p>
-                <h4 class="fw-medium"><span class="service_successed_kpi">{{ number_format($kpi_successed) }}</span> <small class="fs-12 fw-light text-secondary service_successed_percentage">({{ $kpi_successed_percentage.'%' }}) </small></h4>
+                <h4 class="fw-medium"><span class="service_successed_kpi" style="cursor: pointer;">{{ number_format($kpi_successed) }}</span> <small class="fs-12 fw-light text-secondary service_successed_percentage">({{ $kpi_successed_percentage.'%' }}) </small></h4>
             </div>
         </div>
     </div>

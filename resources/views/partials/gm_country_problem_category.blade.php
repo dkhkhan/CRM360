@@ -22,7 +22,7 @@
             <div class="card border-0 mt-3">
                 <div class="card-body">
                     <div class="row align-items-center">
-                        <p class="mb-1"><span class="text-secondary">Total Cases : </span><a href="" class="gm_total_cases">{{ array_sum($country) }}</a></p>
+                        <p class="mb-1"><span class="text-secondary">Total Cases : </span><a href="" class="gm_total_cases">{{ $country['total_cases'] }}</a></p>
                     </div>
                 </div>
                 <div class="card-footer">
@@ -80,7 +80,7 @@
                     </div>
                 </div>
             @endif
-            @if(!in_array('Failed',array_keys($country)) && !in_array('Nearing SLA Breach',array_keys($country)))
+            @if(in_array('Failed',array_keys($country)) && $country['Failed'] == 0 && in_array('Nearing SLA Breach',array_keys($country)) && $country['Nearing SLA Breach'] == 0)
                 <div class="card border-0 mt-2 my-card card-pluse-animation card border-0 bg-gradient-theme-light theme-green">
                     <div class="card-body">
                         <div class="row align-items-center">
