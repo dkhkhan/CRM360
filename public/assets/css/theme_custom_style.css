@@ -1,0 +1,160 @@
+.card-pluse-animation{
+    animation: mypulse !important;
+    animation-duration: 2s !important;
+    animation-delay: 2s !important;
+    animation-iteration-count: infinite !important;
+}
+.my-card{
+    background-color:rgba(var(--adminux-theme-rgb), 0.9) !important;
+    animation : mycolor;
+    animation-duration : 2s;
+    animation-delay : 2s;
+    animation-iteration-count : infinite;  
+} 
+.my-smallchart{
+    height: 25px !important;
+    width : 50px !important;
+}
+.my-text-animation{
+    animation: myTextpulse !important;
+    animation-duration: 2s !important;
+    animation-delay: 2s !important;
+    animation-iteration-count: infinite !important;
+}
+.my-title-text-animation{
+    animation: myTitleTextpulse !important;
+    animation-duration: 2s !important;
+    animation-delay: 2s !important;
+    animation-iteration-count: infinite !important;
+}
+@keyframes mypulse{
+    0% {
+        transform: scale3d(1,1,1);
+    }
+    50% {
+        transform: scale3d(1.05,1.05,1.05);
+    }
+    100% {
+        transform: scale3d(1,1,1);
+
+    }
+}
+@keyframes myTextpulse{
+    0% {
+        opacity: 1;
+    }
+    50% {
+        opacity : 0.5;
+    }
+    100% {
+        opacity : 1;
+
+    }
+}
+@keyframes myTitleTextpulse{
+    0% {
+        opacity: 0.5;
+    }
+    50% {
+        opacity : 1;
+    }
+    100% {
+        opacity : 0.5;
+
+    }
+}
+.modal-backdrop{
+    z-index: -1;
+}
+.modal-body{
+    height: 60vh;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+.input-group > .form-control, .input-group > .form-select{
+    min-width: 100px;
+    width: 200px;
+    text-align: center;
+}
+.logo-square{
+    background: radial-gradient(circle,#c2ad39 0%, #c2ad39 48%, #c2ad39 100%);
+}
+.loader-square_top_logo{
+    width: 200px;
+    margin-bottom: 20px;
+}
+.leaf{
+    background : none !important;
+}
+.logo-square.animated .icon-logo{
+    -webkit-animation: crmlogoiconsanimate 3s ease infinite !important;
+    animation: crmlogoiconsanimate 3s ease infinite !important;
+}
+.mg_cat_total{
+    cursor: pointer;
+}
+#user_role{
+    background-image: url('') !important;
+}
+
+.was-validated .check-valid.in-valid{
+    box-shadow: 0 1px 0px 0px transparent;
+    -webkit-box-shadow: 0 1px 0px 0px transparent;
+    -moz-box-shadow: 0 1px 0px 0px transparent;
+}
+div#gm_service_request_info.dataTables_info{
+    margin-top: 25px;
+    margin-left: 10px;
+}
+div#gm_service_request_paginate{
+    padding-top: 25px;
+    padding-bottom: 25px;
+}
+/* table#gm_service_request td{
+    padding-top: 15px;
+    padding-bottom: 15px;
+} */
+.dataTables_wrapper .dataTables_paginate .paginate_button.current, .dataTables_wrapper .dataTables_paginate .paginate_button.current:hover{
+    background: linear-gradient(to bottom, #585858 0%, #111 100%) !important;
+}
+td.details-control { 
+    /* Image in the first column to 
+        indicate expand*/ 
+    background: url('images/more.png') 
+        no-repeat center; 
+          
+    cursor: pointer; 
+} 
+
+tr.shown td.details-control { 
+    background: url('images/shrinkdata.PNG')  
+        no-repeat center; 
+} 
+
+table.dataTable td.dt-control:before{
+    color: #fff !important;
+}
+@keyframes crmlogoiconsanimate {
+    0%{
+        transform: scale(1);
+    }
+    50%{
+        transform: scale(1.2);
+        box-shadow: none;
+    }
+    100%{
+        transform: scale(1);
+    }
+}
+@media (min-width : 1350px){
+    .modal_show_total_case{
+        --bs-modal-width : 1450px !important;
+    }
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button.disabled, .dataTables_wrapper .dataTables_paginate .paginate_button.disabled:hover, .dataTables_wrapper .dataTables_paginate .paginate_button.disabled:active{
+	color : #FFF !important;
+}
+.btn-close{
+	background : transparent url('https://beta.crm360.eaglehills.com/assets/css/cross.svg') center/1em auto no-repeat !important;
+}
